@@ -15,6 +15,7 @@ screen_width = tile_size * cols
 screen_height = (tile_size * cols) + margin
 white = (255, 255, 255)
 green = (144, 201, 120)
+font = pygame.font.SysFont('Futura', 24)
 
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Level Editor')
@@ -87,6 +88,11 @@ def draw_world():
                     screen.blit(img, (col * tile_size, row * tile_size - (tile_size // 2)))
 
 
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    screen.blit(img, (x, y))
+
+
 class Button:
     def __init__(self, x, y, image):
         self.image = image
@@ -136,6 +142,9 @@ while run:
     draw_grid()
     draw_world()
 
+    draw_text(f'Level: {level}', font, white, tile_size, screen_height - 60)
+    draw_text('Press UP or DOWN to change level', font, white, tile_size, screen_height - 40)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
@@ -144,9 +153,7 @@ while run:
             pos = pygame.mouse.get_pos()
             x = pos[0] // tile_size
             y = pos[1] // tile_size
-            # check that the coordinates are within the tile area
             if x < 20 and y < 20:
-                # update tile value
                 if pygame.mouse.get_pressed()[0] == 1:
                     world_data[y][x] += 1
                     if world_data[y][x] > 8:
@@ -157,6 +164,11 @@ while run:
                         world_data[y][x] = 8
         if event.type == pygame.MOUSEBUTTONUP:
             clicked = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                level += 1
+            elif event.key == pygame.K_DOWN and level > 1:
+                level -= 1
 
     pygame.display.update()
 
